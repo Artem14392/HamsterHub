@@ -17,8 +17,8 @@ public class GeneratorTest {
     void reportDate_isToday_andActiveFlag_gt10() {
         HamsterTrackerRepository repo = mock(HamsterTrackerRepository.class);
         when(repo.getAllRoundsSnapshot()).thenReturn(Map.of(
-                "h1", 10,   // не активен (нужно >10)
-                "h2", 11    // активен
+                "h1", 10,
+                "h2", 11
         ));
 
         DefoltReportGenerator gen = new DefoltReportGenerator(repo);

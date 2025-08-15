@@ -29,7 +29,6 @@ public class HamsterTrackerServiceTest {
         alerts = mock(AlertService.class);
         reports = mock(ReportGenerator.class);
         service = new HamsterTrackerService(repo, alerts, reports);
-        // не вызываем @PostConstruct/start() — планировщик не нужен в юнит-тестах
     }
 
     @Test
@@ -43,11 +42,9 @@ public class HamsterTrackerServiceTest {
     void wheelSpin_negativeIgnored_shortUpdatesActivityOnly() {
         service.accept(new HamsterEnter("h1", "w1"));
 
-        // отрицательная длительность — игнор
         service.accept(new WheelSpin("w1", -1000));
         assertThat(repo.getRounds("h1")).isZero();
 
-        // короткая < 5 сек — раундов нет, но lastActivity обновился
         Instant before = repo.getAllLastActivity().get("h1");
         service.accept(new WheelSpin("w1", 4_999));
         Instant after = repo.getAllLastActivity().get("h1");
@@ -78,11 +75,9 @@ public class HamsterTrackerServiceTest {
 
     @Test
     void inactivityAlert_sent_whenMoreThan1Hour() throws Exception {
-        // h1 не активен больше часа, h2 — только 30 минут
         repo.updateLastActivity("h1", Instant.now().minus(Duration.ofHours(2)));
         repo.updateLastActivity("h2", Instant.now().minus(Duration.ofMinutes(30)));
 
-        // приватный метод дергаем через рефлексию
         Method m = HamsterTrackerService.class.getDeclaredMethod("checkInactivity");
         m.setAccessible(true);
         m.invoke(service);
